@@ -44,6 +44,19 @@ Após cada fase:
 - **Não superdesenhe.** Calibre a complexidade pelo mini-mundo. Sistema pequeno não precisa de 5 bounded contexts e outbox. A fase 3 explicita esse julgamento.
 - **Não invente regras de negócio.** Se o usuário não disse, não escreva como se ele tivesse dito. Quando faltar info, pergunte.
 
+## Agents (dependências)
+
+A fase 4 despacha agents dedicados em paralelo (não `general-purpose`). Eles devem estar instalados em `~/.claude/agents/`:
+
+| Agent | Usado em | Status |
+|---|---|---|
+| `ddd-domain-test-generator` | fase 4.1 | obrigatório |
+| `ddd-domain-code-generator` | fase 4.1 | obrigatório |
+| `ddd-app-test-generator` | fase 4.2 | a criar (cair em general-purpose se faltar) |
+| `ddd-app-code-generator` | fase 4.2 | a criar (cair em general-purpose se faltar) |
+
+Se um agent obrigatório está faltando, a skill PARA e pede pra instalar antes de prosseguir. Os agents são versionados junto com a skill (mesmo repo).
+
 ## Arquivos
 
 - `phases/01-strategic.md` — método estratégico (domínio, subdomínios, linguagem ubíqua, bounded contexts, mapa de contextos)

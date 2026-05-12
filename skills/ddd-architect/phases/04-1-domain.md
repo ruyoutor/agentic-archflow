@@ -9,29 +9,21 @@ Para cada bounded context (um de cada vez, para manter o contexto dos subagents 
 
 ### 1. Despachar dois subagents em paralelo
 
-Em uma única mensagem, dispare dois subagents `general-purpose`:
+Em uma única mensagem, dispare dois agents via `Agent` tool com `subagent_type` específico (NÃO usar `general-purpose` — os agents dedicados têm tool restrictions e role definitions já carregadas):
 
-#### Subagent A — Gerador de testes de domínio
+- **Agent A — `ddd-domain-test-generator`** (definição em `~/.claude/agents/ddd-domain-test-generator.md`)
+- **Agent B — `ddd-domain-code-generator`** (definição em `~/.claude/agents/ddd-domain-code-generator.md`)
 
-**Prompt deve conter:**
+O role / mandato / convenções / restrições / formato de retorno vivem **nos arquivos dos agents**. No `prompt` da invocação, o orquestrador passa **apenas** o que muda a cada execução:
 
-- **Ler:** caminho absoluto do artefato tático (seção do contexto), caminho do arquivo de contratos, caminho do arquivo de stack
-- **Escrever:** arquivos de teste de domínio (e.g., `internal/<context>/domain/*_test.go`)
-- **Mandato:** cobrir cada invariante listado na seção tática deste contexto. **No mínimo um teste por invariante.** Usar **apenas** tipos e assinaturas do arquivo de contratos. Não inventar comportamento além do documentado.
-- **Restrições:** não testar nada de infra (sem DB, sem HTTP, sem mock de fora dos contratos). Domínio puro.
-- **Retorno esperado:** lista de arquivos escritos + lista de invariantes que o tático deixou ambíguos (não tente adivinhar — sinalize).
+1. **Caminhos absolutos dos artefatos a ler** (tático, stack, contratos, stubs)
+2. **Caminhos absolutos dos arquivos a escrever** (testes para o A, stubs a sobrescrever para o B)
+3. **Nome do bounded context** sendo processado
+4. **Ambiguidades já resolvidas** pelas fases anteriores (e.g., "para `Multa.Quitar` com data anterior à geração, use `ErrDataQuitacaoInvalida`")
+5. **Dados de convergência** quando o tático menciona um algoritmo conhecido mas não detalha os exemplos (e.g., "CPFs válidos para teste: 52998224725, 39053344705, 11144477735"). **Verifique esses exemplos antes de passar** — eles são o ponto de convergência entre os dois agents e um erro aqui produz divergência inevitável (lição registrada na seção 3).
+6. **Algoritmos específicos** quando aplicável (e.g., "algoritmo CPF: mod-11 brasileiro com rejeição de dígitos repetidos")
 
-#### Subagent B — Gerador de código de domínio
-
-**Prompt deve conter:**
-
-- **Ler:** caminho absoluto do artefato tático (seção do contexto), caminho do arquivo de contratos, caminho do arquivo de stack
-- **Escrever:** arquivos de implementação de domínio (e.g., `internal/<context>/domain/*.go`)
-- **Mandato:** agregados, entidades, VOs, domain services. Implementar cada invariante listado. Usar **apenas** tipos e assinaturas dos contratos.
-- **Restrições:** domínio não pode depender de infraestrutura. Sem `database/sql`, sem HTTP, sem broker. Sem features além da spec.
-- **Retorno esperado:** lista de arquivos escritos.
-
-Ambos subagents devem produzir **apenas o que está na spec**. Sem features bônus.
+Despache os dois agents na **mesma mensagem** (Agent calls em paralelo). Eles não se veem; convergem pelos contratos compartilhados.
 
 ### 2. Build e test
 

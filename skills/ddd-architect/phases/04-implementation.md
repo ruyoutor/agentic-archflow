@@ -51,12 +51,22 @@ Esse é o rastro de auditoria. Não pule.
 
 ## Regras gerais para subagents
 
-Em 4.1 e 4.2, ao despachar subagents (use `Agent` com `subagent_type=general-purpose`), o prompt deve conter:
+A skill usa **agents dedicados** (não `general-purpose`) para o paralelismo de testes ∥ código:
 
-1. **O que ler** (caminhos absolutos dos artefatos e contratos)
-2. **O que escrever** (caminhos absolutos dos arquivos de saída)
-3. **Mandato explícito**: gerar **apenas** o que está na spec. Nada de features bônus.
-4. **Restrições da camada**: domínio não pode importar infra; aplicação não pode ter regra de negócio; etc.
-5. **Formato do retorno**: lista de arquivos escritos + lista de ambiguidades encontradas (não inventar; sinalizar).
+| Fase | Agent de testes | Agent de código |
+|---|---|---|
+| 4.1 (domínio) | `ddd-domain-test-generator` | `ddd-domain-code-generator` |
+| 4.2 (aplicação) | `ddd-app-test-generator` *(a criar)* | `ddd-app-code-generator` *(a criar)* |
 
-Despache os dois subagents (testes e código) **na mesma mensagem**, com chamadas `Agent` paralelas. Eles não devem se ver. O ponto do paralelismo é exatamente forçar duas interpretações independentes a encontrar-se nos contratos compartilhados.
+Os agents vivem em `~/.claude/agents/<nome>.md`. Cada agent carrega seu próprio role, mandato, convenções, restrições e formato de retorno. No `prompt` da invocação, o orquestrador passa **apenas** dados específicos da execução:
+
+1. **Caminhos absolutos** dos artefatos a ler (tático, stack, contratos)
+2. **Caminhos absolutos** dos arquivos a escrever ou modificar
+3. **Nome do bounded context** sendo processado
+4. **Ambiguidades já resolvidas** pelas fases anteriores
+5. **Dados de convergência** quando aplicável (e.g., listas de exemplos para algoritmos conhecidos — **verifique antes de passar**, são ponto de divergência inevitável quando errados)
+6. **Algoritmos específicos** que o tático referencia mas não detalha
+
+Despache os dois agents (testes e código) **na mesma mensagem**, com chamadas `Agent` paralelas. Eles não devem se ver. O ponto do paralelismo é forçar duas interpretações independentes a encontrar-se nos contratos compartilhados.
+
+Se um dos agents não existir (e.g., `ddd-app-*-generator` ainda não foi criado), **pare** e peça ao usuário para criar os agents antes de prosseguir, ou caia em `general-purpose` com prompt completo inline — flagga que isso é workaround temporário.
