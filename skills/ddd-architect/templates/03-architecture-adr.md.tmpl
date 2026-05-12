@@ -1,0 +1,62 @@
+# Architecture ADR — <Nome do Sistema>
+
+> Lê: `01-strategic.md`, `02-tactical.md` | A fase 4 lê este arquivo para decidir adapters, padrões de comunicação e fronteiras de transação.
+
+## Avaliação de complexidade
+
+| Eixo | Score | Notas |
+|---|---|---|
+| Nº de bounded contexts | low / med / high | ... |
+| Consistência inter-contextos | low / med / high | ... |
+| Throughput esperado | low / med / high | ... |
+| Tamanho do time | ... | ... |
+| Maturidade operacional | low / med / high | ... |
+| Pressão temporal | low / med / high | ... |
+
+## Decisões
+
+### ADR-001: Topologia de deployment
+
+- **Contexto:** ...
+- **Opções consideradas:** monolito modular | services por contexto | híbrido
+- **Decisão:** ...
+- **Consequências:** ...
+
+### ADR-002: Comunicação inter-contextos
+
+Por edge do mapa de contextos:
+
+| Upstream → Downstream | Estilo | Justificativa |
+|---|---|---|
+| ... | sync / async / ambos | ... |
+
+### ADR-003: Consistência
+
+| Operação | Estratégia | Justificativa |
+|---|---|---|
+| ... | local tx / outbox / saga | ... |
+
+### ADR-004: Padrões de leitura
+
+- **Decisão:** CRUD direto / CQRS com projeções / event sourcing
+- **Justificativa:** ...
+
+### ADR-005: Stack
+
+- **Stack escolhida:** Go (default) / <override>
+- **Convenções aplicáveis:** ver `templates/stacks/<stack>.md`
+
+## Plano de evolução
+
+### v1 (now)
+- ...
+
+### Sinais para v2
+- ...
+
+### Fora de escopo (v1)
+- ...
+
+## Riscos
+
+- ...

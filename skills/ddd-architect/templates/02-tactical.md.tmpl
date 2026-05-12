@@ -1,0 +1,56 @@
+# DDD Tático — <Nome do Sistema>
+
+> Lê: `01-strategic.md` | A próxima fase (3) e os subagents da fase 4 leem este arquivo.
+
+## Bounded context: <Nome>
+
+### Agregados
+
+#### <Aggregate Root>
+
+- **Identidade:** <campo que identifica unicamente, e seu tipo>
+- **Entidades internas:** <sub-entidades, se houver>
+- **Value objects:** <tipos VO usados pelo agregado>
+- **Atributos / Estado:**
+  - `<nome>: <Tipo>` — <nota; marque `?` quando opcional/nullable>
+  - `<nome>: <Tipo>` — ...
+  > Lista completa do estado interno do agregado. Inclui a identidade e todas as referências a outros agregados (por ID). É a partir daqui que os subagents da fase 4 geram os campos do struct e os payloads dos eventos.
+- **Invariantes:**
+  - <regra 1 — vira teste na fase 4.1>
+  - <regra 2>
+- **Operações de domínio:**
+  - `<método>(<args>) → <retorno>` — <descrição>
+
+#### <Outro aggregate>
+
+...
+
+### Domain services
+
+- **<Nome do serviço>** — opera sobre <quais agregados>; <razão de existir>
+
+### Repositórios
+
+| Aggregate | Repositório | Métodos |
+|---|---|---|
+| ... | ... | `OfID`, `Save`, `<query de domínio>` |
+
+### Eventos de domínio
+
+| Evento | Emitido quando | Payload |
+|---|---|---|
+| ... | ... | ... |
+
+### Comandos (entrada de use cases)
+
+| Comando | Descrição | Campos |
+|---|---|---|
+| ... | ... | ... |
+
+## Bounded context: <Próximo>
+
+...
+
+## Ambiguidades / decisões pendentes
+
+- ...
