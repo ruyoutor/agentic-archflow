@@ -38,16 +38,21 @@ Quando os tracks paralelos de teste ∥ código produzem mismatches (teste refer
 
 Nunca reconcilie em silêncio.
 
-## Build log
+## Build log — atualizar a cada sub-fase, ANTES de propor commit
 
-Mantenha `docs/ddd/04-build-log.md` à medida que avança:
+Cada sub-fase (4.0, 4.1, 4.2, 4.3.X, 4.4) deve ter sua seção em `docs/ddd/04-build-log.md` **ANTES** de o orquestrador propor commit. Build log é o **rastro de auditoria** entre sub-fases e entre chats diferentes — sessão futura abre o build log e entende exatamente onde parou.
 
-- Sub-fase iniciada / concluída
-- Arquivos criados
-- Divergências encontradas e resoluções
-- Perguntas em aberto
+Campos mínimos por sub-fase:
 
-Esse é o rastro de auditoria. Não pule.
+- **Iniciada / Concluída** (datas)
+- **Modo** (sequencial / paralelo via subagents / fallback `general-purpose`)
+- **Resultados de build/test** (`go build/vet`, `go test ./...`, `go test -tags=integration ./...` quando houver)
+- **Arquivos criados/modificados** (lista com 1 linha por arquivo descrevendo o conteúdo)
+- **Decisões tomadas** durante a sub-fase (tradeoffs, alternativas consideradas)
+- **Ambiguidades flagadas** (ou explicitamente "Nenhuma.")
+- **Ajustes pós-review** (se houver — review-go, code-review, achados aplicados/mantidos)
+
+Não pule. Não deixe pro fim. Build log atualizado é precondição pra propor commit.
 
 ## Regras gerais para subagents
 

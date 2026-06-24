@@ -32,10 +32,22 @@ Ao ativar a skill:
 
 ## Protocolo de checkpoint
 
-Após cada fase:
-- Salve o artefato no caminho documentado.
-- Diga: "Salvei em `<path>`. Revise/edite o arquivo. Quando quiser seguir pra fase N+1, me diga **seguir**, ou aponte ajustes."
-- Se o usuário editar o `.md` manualmente, a versão editada vira a fonte da verdade — a próxima fase lê do disco, não da memória da conversa.
+Após cada fase ou sub-fase (4.0, 4.1, 4.2, 4.3.X, 4.4) — antes de propor commit:
+
+1. **Atualizar `docs/ddd/04-build-log.md`** com a nova seção (campos mínimos: iniciada/concluída, modo, resultados build/test, arquivos criados/modificados, decisões tomadas, ambiguidades flagadas, ajustes pós-review). **Antes** do commit, não depois.
+
+2. **Verificar build/test verde** — `go build/vet/test ./...` (ou equivalente da stack). Não propor commit com vermelho.
+
+3. **Invocar revisões pré-commit** quando aplicável:
+   - `cardpay-skills:review-go` — projetos Go (já no CLAUDE.md global).
+   - `code-review` (skill do marketplace oficial) — sempre que houver mudança significativa (≥50 LOC, ≥3 arquivos, ou camada nova). Pedir `effort=high` pra cobertura ampla.
+   - Apresentar achados ao usuário; aplicar os que ele aprovar; **documentar os mantidos com justificativa no build log**.
+
+4. **Salvar artefato no caminho documentado** + apresentar ao usuário.
+
+5. **Pausar** — não avançar sem ordem.
+
+Se o usuário editar o `.md` manualmente, a versão editada vira a fonte da verdade — a próxima fase lê do disco, não da memória da conversa.
 
 ## Regras transversais
 
@@ -52,8 +64,8 @@ A fase 4 despacha agents dedicados em paralelo (não `general-purpose`). Eles de
 |---|---|---|
 | `ddd-domain-test-generator` | fase 4.1 | obrigatório |
 | `ddd-domain-code-generator` | fase 4.1 | obrigatório |
-| `ddd-app-test-generator` | fase 4.2 | a criar (cair em general-purpose se faltar) |
-| `ddd-app-code-generator` | fase 4.2 | a criar (cair em general-purpose se faltar) |
+| `ddd-app-test-generator` | fase 4.2 | obrigatório |
+| `ddd-app-code-generator` | fase 4.2 | obrigatório |
 
 Se um agent obrigatório está faltando, a skill PARA e pede pra instalar antes de prosseguir. Os agents são versionados junto com a skill (mesmo repo).
 

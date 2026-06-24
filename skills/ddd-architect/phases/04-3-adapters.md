@@ -7,6 +7,46 @@
 
 Adapters dependem de infra real (schema Postgres, especificidades do framework HTTP, cliente do broker). Gerar testes em paralelo a partir da spec forçaria o agente de teste a inventar detalhes de infra. Melhor: código primeiro, depois testes de integração focados contra a infra escolhida.
 
+## Protocolo de decisão colaborativa (OBRIGATÓRIO)
+
+Adapters são heterogêneos (DB, HTTP server, HTML parser, cliente externo, queue, etc.) — não há padrão único. **Decisões técnicas são tomadas por adapter, em conversa com o usuário, ANTES de implementar.** Não inventar defaults silenciosos.
+
+Antes de implementar cada adapter, alinhe explicitamente os 4 pontos abaixo:
+
+### 1. Porta no `contracts.go`
+
+Assinatura da interface (métodos, parâmetros, retornos, sentinel errors).
+
+- Se a porta ainda não existe ou precisa ser ajustada, **edite `contracts.go` ANTES** de implementar o adapter.
+- Mostre o diff da edição ao usuário antes de salvar.
+- Adapter sempre **implementa** uma porta do domínio — nunca o contrário (adapter ditando contrato).
+
+### 2. Biblioteca / cliente externo
+
+Qual dependência externa será usada. Liste alternativas com tradeoffs explícitos (e.g., `mattn/go-sqlite3` cgo vs `modernc.org/sqlite` puro Go; `chi` vs `gorilla/mux` vs `net/http` stdlib).
+
+Espere decisão do usuário. Em caso de empate técnico, recomende uma com justificativa, mas não force.
+
+### 3. Estratégia de teste
+
+Pra cada adapter, declare ANTES de codar:
+
+- **Integration test** (real I/O, tag `//go:build integration`) — pra adapters de DB, fila, etc.
+- **Unit com `httptest.Server` ou fakes locais** — pra clientes HTTP, parsers.
+- **Mista** — base unit + smoke integration.
+
+A escolha vira tag de build apropriada e estrutura de fixtures.
+
+### 4. Composição (DI) no composition root
+
+Confirme com o usuário **onde** e **como** o adapter será injetado no composition root (fase 4.4). Isso evita adapter que depende de algo que o composition root não tem como fornecer.
+
+Decisão típica: adapter recebe `*sql.DB` / `*http.Client` / config struct via construtor; composition root provê.
+
+---
+
+Nunca avance pra implementação sem esses 4 pontos alinhados. **Em chat novo, isso significa: PERGUNTE; não invente padrão.**
+
 ## Método
 
 Para cada tipo de adapter (conforme o ADR de arquitetura):
