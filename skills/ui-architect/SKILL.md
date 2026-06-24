@@ -26,11 +26,13 @@ Ao ativar a skill:
 
 2. **Detectar artefatos de DDD.** Verifique se `docs/ddd/` existe. Se sim, informe ao usuário quais artefatos foram encontrados e que serão usados como input nas fases correspondentes. Se não existe, a skill funciona standalone a partir do mini-mundo bruto — peça o mini-mundo se não foi fornecido.
 
-3. **Obter o mini-mundo.** Se o usuário não forneceu e não há `docs/ddd/01-strategic.md`, peça. Sondar: atores, contextos de uso, dispositivos-alvo, restrições visuais.
+3. **Detectar contrato de backend (gate duro).** Antes de desenhar qualquer tela (fase 2 em diante), localize e leia o contrato **real** do backend — não a intenção de design — nesta ordem de prioridade: (a) **OpenAPI/Swagger** (`openapi.{yaml,json}`, `swagger.*`, rota servida tipo `/openapi.json`) — fonte primária; (b) **ADRs e decisões** (`docs/ddd/03-architecture.md`, ADRs) — onde mora o que foi decidido **não** fazer; (c) **tático** (`docs/ddd/02-tactical.md`). Produza um inventário curto: endpoints/queries disponíveis, campos que cada um retorna, e as **não-capacidades explícitas** (ex.: "snapshot-only, sem série histórica"). Se nenhuma fonte existe e o projeto não foi declarado greenfield, **pare** e pergunte ao usuário onde mora o contrato. Esse inventário é **restrição dura** das fases 2–4.
 
-4. **Detectar stack.** Default `vite-react-ts`. Se o usuário passou `stack=<nome>` ou mencionou outra stack, use-a. Leia `templates/stacks/<stack>.md`. Se o arquivo não existir, **pare** e peça ao usuário as convenções; escreva o arquivo de stack antes de prosseguir.
+4. **Obter o mini-mundo.** Se o usuário não forneceu e não há `docs/ddd/01-strategic.md`, peça. Sondar: atores, contextos de uso, dispositivos-alvo, restrições visuais.
 
-5. **Rodar fase a fase, com checkpoint.** Leia o arquivo de método da fase, conduza o trabalho em conversa, escreva o artefato usando o template correspondente, apresente, pause. Não avance sem ordem do usuário.
+5. **Detectar stack.** Default `vite-react-ts`. Se o usuário passou `stack=<nome>` ou mencionou outra stack, use-a. Leia `templates/stacks/<stack>.md`. Se o arquivo não existir, **pare** e peça ao usuário as convenções; escreva o arquivo de stack antes de prosseguir.
+
+6. **Rodar fase a fase, com checkpoint.** Leia o arquivo de método da fase, conduza o trabalho em conversa, escreva o artefato usando o template correspondente, apresente, pause. Não avance sem ordem do usuário.
 
 ## Protocolo de checkpoint
 
@@ -42,7 +44,9 @@ Após cada fase:
 ## Regras transversais
 
 - **Os artefatos são o contrato entre fases.** A fase N+1 nunca usa informação da fase N que não esteja escrita no artefato. Se o artefato está vago, conserte o artefato — não compense na próxima fase.
-- **Não modifique artefatos de DDD.** Se identificar gap (ex.: JTBD sem use case correspondente, tela que precisa de comando ausente no tático), sinalize ao usuário em vez de inventar. Gaps de DDD são consertados via `ddd-architect`, não via `ui-architect`.
+- **Não modifique artefatos de DDD.** Se identificar gap (ex.: JTBD sem use case correspondente, tela que precisa de comando ausente no tático, ou **capacidade que o backend não expõe** — campo, endpoint, série de dados), sinalize ao usuário em vez de inventar. Gaps de DDD e de capacidade são consertados via `ddd-architect` / backlog de backend, não via `ui-architect`.
+- **Todo elemento de tela rastreia a uma capacidade do contrato (proveniência).** Cada métrica/componente do spec carrega de onde vem (ex.: `GET /api/portfolio → absoluteDifference`). O que não tem fonte no contrato é marcado `(sem fonte no backend)` — vira gap explícito, **nunca renderizado fingindo existir**. Esta flag é **informativa** (sinaliza, não bloqueia o fluxo).
+- **Aspiracional vs. construível.** Mockups que exploram a UX ideal são bem-vindos, mas devem ser **rotulados**: *construível* = preso ao contrato, é o que a fase 4 implementa; *aspiracional* = pode exceder o backend, desde que marcado. Todo excesso de um mockup aspiracional vira **demanda registrada** (backlog de `docs/ddd/` ou `ddd-architect`), não gambiarra no front. Nunca apresente um aspiracional como se fosse construível.
 - **Seja explícito sobre incerteza.** Ao propor um modelo, decisão de IA ou componente, liste alternativas consideradas e o porquê da escolha. Tradeoffs vão no artefato, não só na conversa.
 - **Não superdesenhe.** Calibre a complexidade pelo mini-mundo. Sistema pequeno não precisa de 5 personas e 10 jornadas. Cada fase explicita esse julgamento.
 - **Não invente requisitos.** Se o usuário não disse, não escreva como se ele tivesse dito. Quando faltar info, pergunte.
