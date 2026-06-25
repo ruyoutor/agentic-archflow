@@ -68,7 +68,7 @@ as signatures dos hooks de `api.ts`. Se um agent obrigatório está faltando, a 
 ## Arquivos
 
 - `phases/01-discovery.md` — método de UX discovery (personas, JTBD, jornadas, requisitos NF, restrições)
-- `phases/02-ia-flows.md` — método de IA e fluxos *(a criar)*
+- `phases/02-ia-flows.md` — método de IA e fluxos (mapa de telas, navegação, controles transversais)
 - `phases/03-design-system.md` — método de design system (tokens, catálogo, spec por componente)
 - `phases/04-implementation.md` — orquestrador: fundação + cortes verticais despachando os 2 agents
 - `templates/01-discovery.md.tmpl` — template do artefato de discovery
