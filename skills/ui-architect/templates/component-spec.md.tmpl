@@ -1,0 +1,55 @@
+# Spec de componente — <NomeDoComponente>
+
+> **Contrato de convergência** dos agents `ui-component-code-generator` e
+> `ui-component-test-generator` (rodam em paralelo, cegos um pro outro). Tudo que os dois
+> precisam concordar mora aqui. Um spec por componente/tela não-trivial. Sai da fase 3,
+> é consumido na fase 4. Se está vago, conserte o spec — não deixe o agent inventar.
+
+## Identidade
+- **Componente:** <NomeDoComponente>
+- **Arquivo:** `src/features/<x>/<...>.tsx` (ou `components/shared/<...>.tsx`)
+- **Tipo:** apresentação (recebe dados prontos) | container (usa hook) | página (orquestra estados)
+
+## Props
+```ts
+type <Nome>Props = {
+  // tipos EXATOS. Dados do backend referenciam components['schemas'][...] (types.gen.ts).
+}
+```
+
+## Dados & proveniência (se container/página)
+- **Hook:** `useXxx(args)` em `features/<x>/api.ts` — query key `['...']`.
+- **Endpoint:** `MÉTODO /...` → `<SchemaResponse>` (OpenAPI).
+- **Campo → elemento:** o que alimenta o quê (rastreabilidade; nada renderiza sem fonte).
+
+| Campo do contrato | Elemento na UI |
+|---|---|
+| `absoluteDifference` | número focal (R$) |
+
+## Estados (se container/página) — todos obrigatórios quando se aplicam
+| Estado | Quando | O que mostra | Âncora de teste |
+|---|---|---|---|
+| loading | `isPending` | skeletons | `.animate-pulse` presente |
+| vazio | `data` sem itens | convite a agir | texto `"<copy exata>"` |
+| erro | `error` | badge + mensagem; CTA se `isSetupPending` | role `button` nome `"<copy>"` |
+| carregado | `data` com itens | conteúdo | ver superfície testável |
+
+## Superfície testável — O CONTRATO
+Selectors, roles e copy **estáveis**. O code-gen DEVE emitir exatamente isto; o test-gen
+asserta exatamente isto. Mudou aqui = muda nos dois. Prefira `data-testid` para elementos
+de interação e `getByText`/role para conteúdo visível ao usuário.
+
+| `data-testid` / role | nome acessível / copy | visível quando |
+|---|---|---|
+| `open-register` (button) | "Registrar" | sempre |
+| (text) | "Nenhum lançamento ainda." | estado vazio |
+
+## Comportamento (interação → resultado observável)
+- Clicar `<testid>` → <efeito> (abre dialog / dispara mutation + toast / navega para `/...`).
+- Submeter formulário inválido → mensagens de validação (copy do schema zod) visíveis.
+- Mutation com sucesso → invalida `['...']` + toast `"<copy>"`.
+
+## Convenções herdadas (não repetir, só referenciar)
+- Stack: `templates/stacks/<stack>.md`. Dinheiro em centavos (`formatBRL`/`formatBRL2`),
+  razão→% (`formatPct`). Erros via `ApiError` + `messageForError`.
+- Acessibilidade WCAG AA; `prefers-reduced-motion` em qualquer animação.

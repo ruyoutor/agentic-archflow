@@ -58,16 +58,20 @@ A fase 4 despacha agents dedicados em paralelo (não `general-purpose`). Eles de
 
 | Agent | Usado em | Status |
 |---|---|---|
-| `ui-component-test-generator` | 4.1..N | a criar |
-| `ui-component-code-generator` | 4.1..N | a criar |
+| `ui-component-test-generator` | 4.1..N | ✓ em `agents/` |
+| `ui-component-code-generator` | 4.1..N | ✓ em `agents/` |
 
-Se um agent obrigatório está faltando, a skill PARA e pede pra instalar antes de prosseguir. Os agents são versionados junto com a skill (mesmo repo).
+Os dois rodam **em paralelo, cegos um pro outro**, e convergem pelo **spec de componente**
+(superfície testável: props, estados, copy, `data-testid`/roles) + os tipos da OpenAPI +
+as signatures dos hooks de `api.ts`. Se um agent obrigatório está faltando, a skill PARA e pede pra instalar antes de prosseguir. Os agents são versionados junto com a skill (mesmo repo).
 
 ## Arquivos
 
 - `phases/01-discovery.md` — método de UX discovery (personas, JTBD, jornadas, requisitos NF, restrições)
 - `phases/02-ia-flows.md` — método de IA e fluxos *(a criar)*
-- `phases/03-design-system.md` — método de design system (tokens, catálogo, spec por tela) *(a criar)*
-- `phases/04-implementation.md` — orquestrador da fase de código por cortes verticais *(a criar)*
+- `phases/03-design-system.md` — método de design system (tokens, catálogo, spec por componente)
+- `phases/04-implementation.md` — orquestrador: fundação + cortes verticais despachando os 2 agents
 - `templates/01-discovery.md.tmpl` — template do artefato de discovery
-- `templates/stacks/vite-react-ts.md` — convenções da stack default *(a criar)*
+- `templates/component-spec.md.tmpl` — spec de componente (contrato de convergência dos agents)
+- `templates/stacks/vite-react-ts.md` — convenções da stack default
+- `agents/ui-component-code-generator.md`, `agents/ui-component-test-generator.md` — agents da fase 4
