@@ -37,6 +37,10 @@ Você gera testes pra UI de um corte vertical, cobrindo estados e comportamento 
   ```
 - Asserções: `screen.getByTestId(...)`, `screen.getByRole('button', { name: /.../ })`, `screen.getByText(/copy do spec/i)`. Loading → `container.querySelector('.animate-pulse')`.
 - Schema zod puro → teste unitário direto (`schema.safeParse(...)`), sem render.
+- **Formulário é assíncrono.** `handleSubmit` do react-hook-form e a validação rodam async —
+  asserções de submit/validação/mutate vão com `await waitFor(...)` ou `await screen.findByText(...)`,
+  **nunca** síncronas após `fireEvent.click`. E `toHaveValue` recebe **string literal**, não matcher
+  assimétrico (`expect.stringMatching`). (Lição do dogfood 4.5.)
 - Naming verboso é OK: `it('erro de setup (503): mostra CTA de atualizar', ...)`.
 
 ## Cobertura mínima por tipo
