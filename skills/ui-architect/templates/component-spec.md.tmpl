@@ -44,6 +44,10 @@ de interação e `getByText`/role para conteúdo visível ao usuário.
 | `open-register` (button) | "Registrar" | sempre |
 | (text) | "Nenhum lançamento ainda." | estado vazio |
 
+> **Toasts/notificações também são contrato.** Se há feedback via toast (sucesso/erro de
+> mutação), declare uma âncora testável — `data-testid` na região do toast OU a copy exata como
+> item desta tabela. Sem âncora, o test-gen não consegue cobrir o feedback (lição do dogfood 4.4).
+
 ## Comportamento (interação → resultado observável)
 - Clicar `<testid>` → <efeito> (abre dialog / dispara mutation + toast / navega para `/...`).
 - Submeter formulário inválido → mensagens de validação (copy do schema zod) visíveis.

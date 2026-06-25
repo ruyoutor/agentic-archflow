@@ -30,10 +30,14 @@ Por corte, o orquestrador prepara o **contrato** e despacha os dois agents:
    - `ui-component-code-generator`: specs + stack + `types.gen.ts` + `api.ts` + stubs a preencher.
    - `ui-component-test-generator`: specs + stack + `types.gen.ts` + `api.ts` + caminhos dos `*.test.tsx`.
    Eles não se veem; convergem pelo spec (superfície testável) + signatures dos hooks.
-4. **Reconciliação:** rode `npm run build` e `vitest run`. Teste vermelho por selector/copy que
-   não bate é **sinal**, não ruído: ou o code-gen não honrou o spec, ou o spec estava ambíguo.
-   Conserte a **causa** (código ou spec), nunca afrouxe o teste pra passar. Esse sinal é o valor
-   do approach (a) — verificação real, não tautologia.
+4. **Reconciliação:** rode `npm run build` e `vitest run` (**suíte completa**, não só os arquivos
+   do corte). Teste vermelho por selector/copy que não bate é **sinal**, não ruído: ou o code-gen
+   não honrou o spec, ou o spec estava ambíguo. Conserte a **causa** (código ou spec), nunca
+   afrouxe o teste pra passar. Esse sinal é o valor do approach (a) — verificação real, não tautologia.
+   - **Integração com componentes existentes:** se o corte monta um componente novo dentro de um
+     pai já testado, atualize o `vi.mock` do teste do pai para cobrir o novo hook que o filho usa
+     (senão o teste do pai quebra com "No X export defined on the mock"). É tarefa do orquestrador,
+     não dos agents (lição do dogfood 4.4).
 5. **Checkpoint por corte:** build verde + testes + screenshot ao vivo (quando o backend estiver
    no ar). Registre no `04-build-log.md` com proveniência (cada elemento → campo do contrato).
 
