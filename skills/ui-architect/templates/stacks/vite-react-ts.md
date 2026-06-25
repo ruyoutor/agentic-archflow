@@ -83,6 +83,9 @@ web/
   razão crua. Sinalizado pra correção da OpenAPI.)
 - **`absoluteDifference` inclui realizado** (`currentValue + realizados − equivalente`),
   conforme o código Go (ADR-011), apesar da descrição abreviada na OpenAPI.
+- **Datas de calendário em UTC.** Campos de data (ex.: `tradedAt`) trafegam como `...T00:00:00Z`.
+  Formate com `timeZone: 'UTC'` e fatie `slice(0,10)` para inputs `type="date"` — formatar no
+  fuso local desloca o dia em fusos atrás de Greenwich (UTC-3 → dia anterior; bug UI-002).
 
 ## Tokens → Tailwind / shadcn
 

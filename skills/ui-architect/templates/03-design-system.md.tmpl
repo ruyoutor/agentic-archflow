@@ -1,0 +1,36 @@
+# Design system — <Sistema>
+
+> Artefato da fase 3 da `ui-architect`. Tokens + catálogo + **specs por componente** (o contrato
+> que os agents da fase 4 consomem). Lê `02-ia-flows.md` + o contrato de backend.
+
+## Tokens (CSS vars)
+> Processo `artifact-design`: brainstorm de tokens → autocrítica contra os defaults → paleta
+> fechada, ancorada no subject. Viram `tailwind.config` + tema shadcn na fase 4.
+
+```css
+:root {
+  --accent: <hex>;        /* + cores semânticas (pos/neg/etc.) */
+  --font-sans: <...>;
+  --font-mono: <...>;     /* se a identidade pedir mono */
+  --radius: <...>;
+}
+```
+- Tema: <light | dark | ambos>. Tipografia: <display / body / mono> e o porquê.
+- Precedência: design system existente do projeto manda; o processo só preenche lacunas.
+
+## Catálogo de componentes
+| Componente | Tipo | Átomos shadcn | Tela(s) |
+|---|---|---|---|
+| <RéguaGanho> | apresentação | — (canvas) | Consolidado, Detalhe |
+| <PositionsTable> | apresentação | table | Consolidado |
+| <RegisterDialog> | container/form | dialog, input, select | Lançamentos |
+
+Calibre pelo mini-mundo — não superdesenhe. Átomo shadcn usado direto não precisa de spec próprio.
+
+## Specs por componente (contrato de convergência)
+Um spec por componente/tela **não-trivial**, via `templates/component-spec.md.tmpl` — inline aqui
+ou em `docs/ui/specs/<componente>.md`. Pina props, dados+proveniência, estados e a superfície
+testável (`data-testid`/copy/roles). Se o teste vai assertar, o spec declara.
+
+- [ ] <Componente A> → `specs/<a>.md`
+- [ ] <Componente B> → `specs/<b>.md`

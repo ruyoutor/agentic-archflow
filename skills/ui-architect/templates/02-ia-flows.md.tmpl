@@ -1,0 +1,34 @@
+# IA & Fluxos — <Sistema>
+
+> Artefato da fase 2 da `ui-architect`. Lê `01-discovery.md` + o contrato de backend (gate).
+> Cada tela/elemento rastreia a uma capacidade do contrato — não desenhe o que o backend não entrega.
+
+## Mapa de telas
+| Tela | JTBD que atende | Rota | Endpoint(s) | Estados |
+|---|---|---|---|---|
+| <Consolidado> | <pergunta que responde> | `/` | `GET /...` | loading · vazio · erro · carregado |
+| <Detalhe> | <...> | `/x/:id` | `GET /...` | ... |
+
+Tela primária (onde o usuário cai): <qual>.
+
+## Modelo de navegação
+- Hierarquia de rotas: <ex.: `/` → `/ativo/:id`>.
+- Drill-down: <navegação por rota | expansão in-place> — porquê: <...>.
+- Estado de entrada por rota: <ex.: detalhe precisa de `:id` + parâmetro transversal na URL>.
+
+## Controles transversais (não são telas — vivem no app shell)
+| Controle | Onde mora | Persistência |
+|---|---|---|
+| <seletor de benchmark> | header | <query param `?b=` (linkável) \| sessão \| volta ao default> |
+| <atualizar agora> | header | — |
+
+## Fluxos principais
+### <Jornada 1 — nome>
+1. <passo> → <tela/ação>
+2. ...
+- Momentos de decisão: <...>
+- Mutação + feedback: <o que muda e o que o usuário vê depois>
+
+## Não-capacidades respeitadas
+- <ex.: sem seletor de período arbitrário — backend é snapshot-only (decisão N do mini-mundo)>.
+- <capacidade que a UI gostaria mas o backend não tem → vira demanda no backlog, não tela fantasma>.

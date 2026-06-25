@@ -72,6 +72,8 @@ as signatures dos hooks de `api.ts`. Se um agent obrigatório está faltando, a 
 - `phases/03-design-system.md` — método de design system (tokens, catálogo, spec por componente)
 - `phases/04-implementation.md` — orquestrador: fundação + cortes verticais despachando os 2 agents
 - `templates/01-discovery.md.tmpl` — template do artefato de discovery
+- `templates/02-ia-flows.md.tmpl` — template do artefato de IA & fluxos
+- `templates/03-design-system.md.tmpl` — template do artefato de design system (tokens + catálogo + specs)
 - `templates/component-spec.md.tmpl` — spec de componente (contrato de convergência dos agents)
 - `templates/stacks/vite-react-ts.md` — convenções da stack default
 - `agents/ui-component-code-generator.md`, `agents/ui-component-test-generator.md` — agents da fase 4
