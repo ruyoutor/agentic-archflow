@@ -1,0 +1,1 @@
+PROMPT da criação: claude --resume cc18053a-6203-4e5b-97b8-9c8eb0938f38
