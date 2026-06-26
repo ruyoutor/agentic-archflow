@@ -1,0 +1,76 @@
+# {{CHG_ID}} — {{título}}
+
+- **Tipo:** {{feature nova | mudança de comportamento | remoção | bug}}
+- **Status:** {{inbox | triada | em construção | em revisão | entregue | removida}}
+- **Aberta:** {{data}}  ·  **Entregue:** {{data ou —}}
+
+## 1. Problema / motivação (job-to-be-done)
+> Como {{ator}}, quero {{capacidade}}, para {{resultado}}.
+
+{{O problema real, na voz do usuário. O que dói hoje. Por que agora.}}
+
+## 2. Valor / hipótese
+{{Que decisão melhor ou dor resolvida isso entrega. Se aplicável, a hipótese a validar.}}
+
+## 3. Critério de aceite (testável)
+- [ ] {{Dado … quando … então … — observável, vira teste.}}
+- [ ] {{O que NÃO muda — o comportamento existente que deve ser preservado.}}
+
+## 4. Fatia mínima vertical
+{{O menor corte fim-a-fim que entrega valor. Se a mudança não cabe numa volta, listar as fatias sequenciais e marcar qual é esta.}}
+
+## 5. Ambiguidades a resolver (levantadas na fase 1, decididas via deliberação)
+- {{Pergunta de domínio/produto que precisa de decisão antes de construir.}}
+
+## Log de decisões (preenchido conforme as ambiguidades são deliberadas)
+> Uma entrada por dúvida resolvida. O debate é chat livre; aqui fica só o resíduo durável.
+
+### D1 — {{a pergunta}}
+- **Opções pesadas:** {{A: … / B: … / C: …}}
+- **Decisão:** {{a escolhida}}
+- **Por quê:** {{o tradeoff que definiu — e o que foi descartado e por quê}}
+- **Resolve a ambiguidade:** {{nº da seção 5}}
+
+---
+<!-- preenchido na FASE 2 — análise de impacto -->
+## 6. Impacto no modelo vivo
+- **Domínio** (`docs/ddd/02-tactical.md`): {{agregados/VOs/invariantes tocados; muda invariante? novo cálculo?}}
+- **Arquitetura** (`docs/ddd/03-architecture.md`): {{toca/cria ADR? revisita decisão?}}
+- **Contrato** (`docs/api/openapi.yaml`): {{endpoint/campo novo ou alterado? quebra compatibilidade?}}
+- **UI** (`docs/ui/`): {{telas/componentes/design system tocados?}}
+- **DEM/backlog:** {{resolve um DEM existente? cria um novo?}}
+- **Decisões tomadas nas ambiguidades:** {{resposta de cada item da seção 5.}}
+
+## 7. Plano de build (fase 3)
+- Delega a: {{ddd-architect (modo incremental) | ui-architect (modo incremental) | só código direto}}
+- Ordem: {{backend → contrato → frontend, ou o que a fatia exigir}}
+
+---
+<!-- preenchido na FASE 4 — aterrissagem -->
+## 8. Rastros
+- **Artefatos atualizados:** {{tático, ADR, design system, build-log, bugs.md…}}
+- **Commits:** {{hash + mensagem}}
+- **Verificação ao vivo:** {{o que foi observado funcionando}}
+
+## 9. Footprint (preenchido na fase 4 — habilita remoção futura)
+> O que esta fatia introduziu/tocou, com precisão suficiente pra ser removida depois sem arqueologia.
+- **Código adicionado:** {{arquivos/símbolos novos — ex.: `Position.unrealizedAbsoluteDifference`}}
+- **Código alterado:** {{pontos tocados em código preexistente}}
+- **Contrato:** {{campos/endpoints adicionados ou alterados; aditivo ou breaking}}
+- **Dados/migração:** {{tabelas/colunas/migrations — ou "nenhuma"}}
+- **Dependências externas:** {{libs/serviços novos — ou "nenhuma"}}
+- **Risco de entrelaçamento:** {{baixo/médio/alto — o quanto outras partes tendem a passar a depender disto}}
+
+---
+<!-- preenchido SE/QUANDO a feature for removida (ver phases/removal.md) -->
+## 10. Remoção
+- **Data:** {{data}}  ·  **Motivo:** {{por que deixou de valer a pena}}
+- **Cenário:** {{limpo (revert) | entrelaçado (remoção forward)}}
+- **Dependentes encontrados:** {{CHGs/áreas que dependiam disto — ou "nenhum"}}
+- **Como foi feito:** {{git revert <commits> | remoção cirúrgica — o que foi tirado}}
+- **Commit/PR de remoção:** {{hash}}
+- **Verificação:** {{build/test verde + app de pé após a remoção}}
+
+---
+<!-- RESERVADO para PM/PO pleno — vazio até a ambição crescer -->
+<!-- Prioridade: · Épico: · Esforço/RICE: · Métrica de sucesso: · Owner: -->
