@@ -17,7 +17,7 @@ backend → contrato → frontend.
 - [ ] **Mini-mundo** num `.md` acessível (raiz do projeto novo ou `~/Downloads/`).
 - [ ] **Repo git** inicializado no projeto (`git init`) — pra commitar fase a fase.
 - [ ] **Stack** decidida — default Go (backend) + `vite-react-ts` (frontend); senão, prepare o override.
-- [ ] Agents instalados (`~/.claude/agents` → `build-skills/agents`, symlink do diretório): `ddd-*`, `ui-component-*` e `feature-loop-acceptance-verifier`. Nada a fazer.
+- [ ] Agents instalados (`~/.claude/agents` → `agentic-archflow/agents`, symlink do diretório): `ddd-*`, `ui-component-*` e `feature-loop-acceptance-verifier`. Nada a fazer.
 
 ## 2. Sequência recomendada (full-stack)
 
