@@ -1,58 +1,86 @@
 # {{CHG_ID}} — {{título}}
 
 - **Tipo:** {{feature nova | mudança de comportamento | remoção | bug}}
-- **Status:** {{inbox | triada | em construção | em revisão | entregue | removida}}
+- **Status:** {{inbox | em refinamento | pronta para desenvolvimento | em análise de impacto | em construção | construída | entregue | removida}}
 - **Aberta:** {{data}}  ·  **Entregue:** {{data ou —}}
+
+<!-- Raias: refinamento (feature-loop/PO) → pronta pra desenvolvimento (handoff do USUÁRIO)
+     → análise de impacto + construção (builder em modo evolução) → aterrissagem (feature-loop). -->
 
 ## 1. Problema / motivação (job-to-be-done)
 > Como {{ator}}, quero {{capacidade}}, para {{resultado}}.
 
 {{O problema real, na voz do usuário. O que dói hoje. Por que agora.}}
 
-## 2. Valor / hipótese
-{{Que decisão melhor ou dor resolvida isso entrega. Se aplicável, a hipótese a validar.}}
+## 2. Contexto de produto & valor
+{{O que o usuário do produto vive hoje e o que muda pra ele. Objetivo em uma frase. Que decisão
+melhor ou dor resolvida isso entrega; se aplicável, a hipótese a validar. Product-only: nada de
+endpoint/campo/agregado/componente aqui.}}
 
-## 3. Critério de aceite (testável)
+## 3. Critério de aceite (testável — é com isto que o aceite independente trabalha)
 - [ ] {{Dado … quando … então … — observável, vira teste.}}
 - [ ] {{O que NÃO muda — o comportamento existente que deve ser preservado.}}
 
 ## 4. Fatia mínima vertical
-{{O menor corte fim-a-fim que entrega valor. Se a mudança não cabe numa volta, listar as fatias sequenciais e marcar qual é esta.}}
+{{O menor corte fim-a-fim que entrega valor. Se a mudança não cabe numa volta, é um épico: listar as
+histórias sequenciais no backlog e marcar qual é esta.}}
 
-## 5. Ambiguidades a resolver (levantadas na fase 1, decididas via deliberação)
-- {{Pergunta de domínio/produto que precisa de decisão antes de construir.}}
+## 5. Ambiguidades
+### 5a. De produto (decididas no refinamento — ver log de decisões)
+- {{Pergunta de produto deliberada na fase 1.}}
 
-## Log de decisões (preenchido conforme as ambiguidades são deliberadas)
+### 5b. Técnicas / de domínio (PARA A BUILDER responder na análise de impacto)
+- {{Pergunta que precisa do código à mão — a builder responde na E1, não o PO no chute.}}
+
+## Mockup de UX (quando a fatia tem UI)
+- **Arquivo:** {{docs/changes/mockups/CHG-NNN-<slug>.md — ou "sem UI"}}
+- **Rótulo:** {{construível | aspiracional (excessos viram demanda registrada)}}
+- **Nota:** {{intenção de interface da história; a ui-architect promove a spec de componente na E1.}}
+
+## Log de decisões (produto na fase 1; técnica na análise de impacto da builder)
 > Uma entrada por dúvida resolvida. O debate é chat livre; aqui fica só o resíduo durável.
 
 ### D1 — {{a pergunta}}
 - **Opções pesadas:** {{A: … / B: … / C: …}}
 - **Decisão:** {{a escolhida}}
 - **Por quê:** {{o tradeoff que definiu — e o que foi descartado e por quê}}
-- **Resolve a ambiguidade:** {{nº da seção 5}}
+- **Resolve a ambiguidade:** {{item da seção 5}}
 
 ---
-<!-- preenchido na FASE 2 — análise de impacto -->
-## 6. Impacto no modelo vivo
+<!-- preenchido pela BUILDER (modo evolução, fase E1 — análise de impacto).
+     CHECKPOINT HUMANO: a builder PARA após preencher; só constrói com o "segue" do usuário.
+     Lacuna de produto encontrada aqui → devolver o card ao refinamento (anotar abaixo). -->
+## 6. Análise de impacto (builder)
+### O que precisa mudar para funcionar
 - **Domínio** (`docs/ddd/02-tactical.md`): {{agregados/VOs/invariantes tocados; muda invariante? novo cálculo?}}
+- **Aplicação:** {{use cases/comandos novos ou alterados}}
+- **Adapters:** {{persistência/migração, http, parsers}}
 - **Arquitetura** (`docs/ddd/03-architecture.md`): {{toca/cria ADR? revisita decisão?}}
 - **Contrato** (`docs/api/openapi.yaml`): {{endpoint/campo novo ou alterado? quebra compatibilidade?}}
-- **UI** (`docs/ui/`): {{telas/componentes/design system tocados?}}
-- **DEM/backlog:** {{resolve um DEM existente? cria um novo?}}
-- **Decisões tomadas nas ambiguidades:** {{resposta de cada item da seção 5.}}
+- **UI** (`docs/ui/`): {{telas/componentes novos vs. editados; design system; mockup promovido a spec?}}
+- **O que NÃO muda:** {{proteção explícita do critério de preservação}}
 
-## 7. Plano de build (fase 3)
-- Delega a: {{ddd-architect (modo incremental) | ui-architect (modo incremental) | só código direto}}
-- Ordem: {{backend → contrato → frontend, ou o que a fatia exigir}}
+### Trade-offs / decisões técnicas
+{{Alternativas de modelagem consideradas e o porquê da escolha — mini-ADRs no log de decisões.
+Respostas às ambiguidades 5b.}}
+
+### Checkpoint
+- **Análise aprovada:** {{pendente | aprovada pelo usuário em {{data}} | devolvida ao refinamento: {{lacuna}}}}
+
+## 7. Plano de build (builder)
+- **Calibragem:** {{edição direta (trivial) | agents escopados à fatia | sub-fases em modo evolução}}
+- **Ordem:** {{domínio → contrato → frontend, ou o que a fatia exigir}}
+- **Footprint previsto:** {{o que a fatia vai adicionar/tocar — a aterrissagem confirma}}
 
 ---
-<!-- preenchido na FASE 4 — aterrissagem -->
+<!-- preenchido na ATERRISSAGEM (feature-loop, fase 3) -->
 ## 8. Rastros
-- **Artefatos atualizados:** {{tático, ADR, design system, build-log, bugs.md…}}
+- **Artefatos auditados:** {{tático, ADR, design system, build-log — com entrada no histórico de revisões}}
+- **Revisões:** {{review-go/code-review rodadas (nos checkpoints da builder ou na aterrissagem); aceite independente: PASS/FAIL/CONCERN}}
 - **Commits:** {{hash + mensagem}}
 - **Verificação ao vivo:** {{o que foi observado funcionando}}
 
-## 9. Footprint (preenchido na fase 4 — habilita remoção futura)
+## 9. Footprint (preenchido na aterrissagem — habilita remoção futura)
 > O que esta fatia introduziu/tocou, com precisão suficiente pra ser removida depois sem arqueologia.
 - **Código adicionado:** {{arquivos/símbolos novos — ex.: `Position.unrealizedAbsoluteDifference`}}
 - **Código alterado:** {{pontos tocados em código preexistente}}

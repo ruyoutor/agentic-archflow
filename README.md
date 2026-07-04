@@ -15,14 +15,15 @@ Três skills, cobrindo as duas fases do ciclo de vida de um sistema:
 
 | Skill | Fase | O que faz |
 |---|---|---|
-| **`ddd-architect`** | Arranque (backend) | Do mini-mundo ao código: estratégico → tático → arquitetura → implementação. Ancorado em Domain-Driven Design. Gera código + testes em paralelo via subagents. Artefatos em `docs/ddd/`. |
-| **`ui-architect`** | Arranque (frontend) | Do mini-mundo (+ contrato do backend) à UI: discovery → IA & fluxos → design system → implementação em cortes verticais. Artefatos em `docs/ui/`. |
-| **`feature-loop`** | Regime permanente | Depois da v1, toda demanda emergente (feature, mudança, remoção, bug) vira uma fatia vertical. Veste o chapéu de PM/PO + arquiteto e **delega** a construção de volta às skills builder. Registro em `docs/changes/`. |
+| **`ddd-architect`** | Arranque (backend) + evolução | Do mini-mundo ao código: estratégico → tático → arquitetura → implementação (DDD, código + testes em paralelo via subagents). Em **modo evolução**, recebe um `CHG-NNN` e responde "o que precisa mudar?" e "quais trade-offs?" antes de construir a fatia cirurgicamente. Artefatos em `docs/ddd/`. |
+| **`ui-architect`** | Arranque (frontend) + evolução | Do mini-mundo (+ contrato do backend) à UI: discovery → IA & fluxos → design system → implementação em cortes verticais. Em **modo evolução**, promove o mockup de UX da história a spec de componente e evolui a UI dentro da fatia. Artefatos em `docs/ui/`. |
+| **`feature-loop`** | Regime permanente | Depois da v1, toda demanda emergente (feature, mudança, remoção, bug) vira uma fatia vertical em raias de board. **PO puro**: escreve a história (valor, critérios de aceite, mockup de UX) e aterrissa (aceite independente + commit) — **não desenvolve**; a construção é roteada pelo usuário às builders em modo evolução. Registro em `docs/changes/`. |
 
 E os agents que as skills despacham em paralelo (em `agents/`):
 
 - `ddd-domain-{code,test}-generator`, `ddd-app-{code,test}-generator` — camadas de domínio e aplicação
 - `ui-component-{code,test}-generator` — componentes de UI
+- `ux-mockup-designer` — mockup de UX product-side na fase de história (feature-loop), estruturado pra ser promovido a spec de componente pela `ui-architect`
 - `feature-loop-acceptance-verifier` — aceite independente, read-only, cego ao build (separação de deveres "quem decide ≠ quem aprova")
 
 ## Princípios
@@ -32,7 +33,8 @@ E os agents que as skills despacham em paralelo (em `agents/`):
 - **Artefatos são o contrato entre fases.** A fase N+1 nunca usa informação que não esteja escrita. Artefato vago? Conserta o artefato — não compensa depois.
 - **Cortes verticais, não camadas horizontais.** Cada volta entrega uma mudança fim-a-fim, verde e commitada.
 - **Não superdesenhe.** A complexidade é calibrada pelo mini-mundo, com tradeoffs explícitos.
-- **Modelo vivo.** `docs/ddd`, `docs/ui` e `docs/changes` evoluem junto com o sistema — nunca ficam desatualizados.
+- **Modelo vivo.** `docs/ddd`, `docs/ui` e `docs/changes` evoluem junto com o sistema — nunca ficam desatualizados. Quem constrói a fatia atualiza os artefatos, com histórico de revisões por `CHG`.
+- **Separação de deveres pela estrutura, não pela promessa.** O PO (`feature-loop`) não desenvolve; quem constrói (builders, em sessão própria) não aprova (aceite por agent cego ao build); quem aprova não comita (gate humano). A análise de impacto é de quem constrói — com checkpoint humano antes do código.
 
 ## Como usar
 
@@ -65,15 +67,26 @@ mini-mundo
 
 ### Evoluir um projeto existente (regime permanente)
 
-Com a v1 de pé, abra um chat novo e conduza pela `feature-loop`:
-
-> Tenho uma demanda nova no `<projeto>` (já tem `docs/ddd`/`docs/ui`). Vamos conduzir pela skill
-> `feature-loop`, começando pela triagem. A demanda é: `<descreva>`.
+Com a v1 de pé, o fluxo é um board com handoff manual — **você move o card entre as raias**:
 
 ```
-demanda → feature-loop:  intake/triagem → impacto/deliberação → build (delega às builder) → aterrissagem
-          (CHG-NNN)        valor+aceite     log de decisões        código+testes              aceite indep. + footprint + commit
+demanda → feature-loop (PO):      história + aceite + mockup UX  →  CHG "pronta pra desenvolvimento"
+(CHG-NNN)   você roteia ↴
+          builder (modo evolução): análise de impacto (checkpoint humano) → construção → artefatos c/ changelog
+            você volta ↴                                                                   (sem commit)
+          feature-loop (aterrissagem): aceite independente + auditoria de sync + footprint + commit
 ```
+
+1. **Refinar** (chat novo): "Tenho uma demanda nova no `<projeto>`. Vamos conduzir pela skill
+   `feature-loop`, começando pela triagem. A demanda é: `<descreva>`."
+2. **Rotear** (chat novo, quando `pronta para desenvolvimento`): "Vamos trabalhar a fatia
+   `docs/changes/CHG-NNN-<slug>.md` pela skill `<builder>` em **modo evolução**. Comece pela análise
+   de impacto e pare no checkpoint pra eu revisar."
+3. **Aterrissar** (quando `construída`): "A fatia `CHG-NNN` está construída. Vamos aterrissar pela
+   `feature-loop`."
+
+Se a análise de impacto da builder revelar lacuna de produto, o card volta pro refinamento — é o
+mecanismo funcionando, não falha.
 
 ## Estrutura do repo
 

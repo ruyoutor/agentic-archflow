@@ -81,20 +81,27 @@ OpenAPI não sair sozinha:
 ## 6. Depois da v1 — regime permanente (`feature-loop`)
 
 Com a v1 de pé, **toda demanda emergente** — feature nova, mudança de comportamento, remoção de
-feature, bug — vira uma **fatia vertical** conduzida pela skill `feature-loop`. Ela **não
-reconstrói**: veste o chapéu de PM/PO + arquiteto e **delega** a construção de volta pra
-`ddd-architect`/`ui-architect` em modo incremental, mantendo o modelo vivo (`docs/ddd`, `docs/ui`)
-em sincronia.
+feature, bug — vira uma **fatia vertical** em raias de board. A `feature-loop` é o **PO puro**: ela
+escreve a história (valor, critérios de aceite, mockup de UX via agent) e depois aterrissa — **não
+desenvolve nem faz análise de impacto técnico**. Quem responde "o que precisa mudar?" e "quais
+trade-offs?" são as builders (`ddd-architect`/`ui-architect`) em **modo evolução**, cada uma em
+sessão própria, roteada por **você** (o handoff manual é a raia do board).
 
 ```
-demanda → feature-loop:  intake/triagem → impacto/deliberação → build (delega às builder) → aterrissagem
-          (CHG-NNN)        valor+aceite     log de decisões        código+testes              aceite indep. + footprint + commit
+demanda → feature-loop (PO):     história + aceite + mockup UX → CHG "pronta pra desenvolvimento"  → PARA
+(CHG-NNN)  VOCÊ roteia ↴
+          builder (modo evolução): análise de impacto (checkpoint humano: "segue" ou volta o card)
+                                   → construção cirúrgica → artefatos evoluídos c/ changelog → SEM commit
+          feature-loop (aterrissagem): aceite independente + auditoria de sync + footprint + commit
 ```
 
 - **Registro:** todas as mudanças vivem em `docs/changes/` — um `backlog.md` (inbox + priorização)
   e um `CHG-NNN-<slug>.md` por fatia (problema, critério de aceite, decisões, footprint).
-- **Deliberação:** dúvidas de design/domínio são debatidas no chat, mas o *porquê* de cada escolha
-  fica no **log de decisões** do CHG (mini-ADR por dúvida).
+- **Deliberação:** dúvidas de **produto** se decidem no refinamento (feature-loop); dúvidas
+  **técnicas** ficam registradas pra builder responder na análise de impacto — o *porquê* de cada
+  escolha fica no **log de decisões** do CHG (mini-ADR por dúvida).
+- **Checkpoint de impacto:** a builder escreve a análise nas seções 6–7 do CHG e **para**; você
+  revisa e manda seguir — ou devolve o card ao refinamento se a história precisa melhorar.
 - **Aceite independente:** a aterrissagem despacha o agent `feature-loop-acceptance-verifier`
   (read-only, cego ao build) — separação de deveres "quem decide ≠ quem aprova". O orquestrador
   **adjudica** o parecer (o verificador pode errar).
@@ -102,8 +109,15 @@ demanda → feature-loop:  intake/triagem → impacto/deliberação → build (d
   CHG-XXX"* seja uma operação barata depois (revert limpo vs. remoção cirúrgica).
 
 **Prompt de abertura (chat novo, projeto existente):**
-> Tenho uma demanda nova no `<projeto>` (já tem `docs/ddd`/`docs/ui`). Vamos conduzir pela skill
-> `feature-loop`, começando pela triagem. A demanda é: `<descreva>`.
+> Tenho uma demanda nova no `<projeto>`. Vamos conduzir pela skill `feature-loop`, começando pela
+> triagem. A demanda é: `<descreva>`.
+
+**Prompt de handoff (quando o CHG estiver `pronta para desenvolvimento` — a fase 2 entrega pronto):**
+> Vamos trabalhar a fatia `docs/changes/CHG-NNN-<slug>.md` pela skill `<ddd-architect|ui-architect>`
+> em **modo evolução**. Comece pela análise de impacto (E1) e pare no checkpoint pra eu revisar.
+
+**Prompt de aterrissagem (quando a builder entregar `construída`):**
+> A fatia `CHG-NNN` está construída. Vamos aterrissar pela `feature-loop`.
 
 **Pra remover uma feature:**
 > Vamos remover a feature `CHG-XXX` do `<projeto>`, usando a `feature-loop`. Motivo: `<por quê>`.

@@ -1,13 +1,17 @@
 ---
 name: ui-architect
-description: "Desenha e constrói a UI de um sistema a partir de uma história de negócio (mini-mundo), opcionalmente consumindo artefatos de DDD. Use quando o usuário quer design-first para UI: refletir sobre personas, jornadas, jobs-to-be-done (discovery) → mapa de telas, navegação, wireframes em Excalidraw (IA) → design tokens, catálogo de componentes, spec por tela (design system) → implementação em cortes verticais por use case com testes em paralelo via subagents. Cada fase produz um artefato markdown versionável em docs/ui/. Triggers: 'desenhar a UI de X', 'arquitetar a interface de Y', 'construir frontend a partir do domínio', 'design-first UI', 'gerar UI a partir do DDD', ou invocação explícita da skill. Stack default Vite+React+TS+Tailwind+shadcn/ui, com override (next-app-router, remix, sveltekit, etc). Mobile nativo fora de escopo (vira skill irmã se vier demanda)."
+description: "Desenha, constrói E EVOLUI a UI de um sistema, opcionalmente consumindo artefatos de DDD. Greenfield: de uma história de negócio (mini-mundo) via discovery (personas, jornadas, JTBD) → mapa de telas e wireframes → design system (tokens, catálogo, spec por tela) → implementação em cortes verticais com testes em paralelo via subagents; artefatos versionáveis em docs/ui/. MODO EVOLUÇÃO (brownfield): recebe um CHG-NNN da feature-loop (com mockup de UX quando houver), promove o mockup a spec de componente, responde 'o que muda na interface?' e 'quais trade-offs?' (análise de impacto com checkpoint humano duro) antes de construir cirurgicamente a fatia e evoluir o design system com histórico de revisões — sem commit (a aterrissagem é da feature-loop). Triggers: 'desenhar a UI de X', 'arquitetar a interface de Y', 'construir frontend a partir do domínio', 'design-first UI', 'gerar UI a partir do DDD', 'trabalhar a fatia CHG-NNN em modo evolução', ou invocação explícita da skill. Stack default Vite+React+TS+Tailwind+shadcn/ui, com override (next-app-router, remix, sveltekit, etc). Mobile nativo fora de escopo (vira skill irmã se vier demanda)."
 ---
 
 # ui-architect
 
-Constrói a UI de um sistema a partir de um mini-mundo, em quatro fases checkpointadas. Cada fase produz um artefato em `docs/ui/` (no projeto target, não na skill). Quando o projeto tem `docs/ddd/`, a skill consome esses artefatos como input. A implementação trabalha em **cortes verticais por use case**, não por camada horizontal.
+Constrói a UI de um sistema a partir de um mini-mundo, em quatro fases checkpointadas — e **evolui** UIs já construídas em fatias, no modo evolução. Cada fase produz um artefato em `docs/ui/` (no projeto target, não na skill). Quando o projeto tem `docs/ddd/`, a skill consome esses artefatos como input. A implementação trabalha em **cortes verticais por use case**, não por camada horizontal.
 
 ## Fluxo
+
+Dois modos:
+
+**Greenfield** (do mini-mundo à v1):
 
 | Fase | Método | Artefato |
 |---|---|---|
@@ -18,21 +22,31 @@ Constrói a UI de um sistema a partir de um mini-mundo, em quatro fases checkpoi
 
 A fase 4 se organiza em sub-fases (4.0 fundação → 4.1..N cortes verticais por use case → 4.Z smoke).
 
+**Evolução** (brownfield — entrada é um `CHG-NNN` da `feature-loop`, com mockup de UX quando houver):
+
+| Fase | Método | Saída |
+|---|---|---|
+| E1. Impacto + promoção do mockup | `phases/evolution.md` | mockup → spec de componente; seções 6–7 do CHG (**checkpoint humano duro**) |
+| E2. Construção cirúrgica | `phases/evolution.md` | diff da fatia, suíte inteira + build verdes |
+| E3. Artefatos + relatório | `phases/evolution.md` | design system/specs evoluídos com histórico de revisões; **sem commit** |
+
 ## Protocolo de ativação
 
 Ao ativar a skill:
 
-1. **Detectar estado.** Verifique se `docs/ui/` existe no projeto target. Se sim, liste os artefatos presentes e pergunte: **retomar**, **revisar fase específica**, ou **recomeçar**. Pule fases já concluídas a menos que o usuário peça revisão.
+1. **Detectar o modo.** Se a entrada é um `CHG-NNN` em `docs/changes/` (handoff da `feature-loop`) ou o usuário pede pra evoluir/mudar uma UI que já tem `docs/ui/` + código construído → **modo evolução**: leia `phases/evolution.md` e siga por ele (as fases 1–4 abaixo são o repertório, não o roteiro). Caso contrário, greenfield.
 
-2. **Detectar artefatos de DDD.** Verifique se `docs/ddd/` existe. Se sim, informe ao usuário quais artefatos foram encontrados e que serão usados como input nas fases correspondentes. Se não existe, a skill funciona standalone a partir do mini-mundo bruto — peça o mini-mundo se não foi fornecido.
+2. **Detectar estado (greenfield).** Verifique se `docs/ui/` existe no projeto target. Se sim, liste os artefatos presentes e pergunte: **retomar**, **revisar fase específica**, ou **recomeçar**. Pule fases já concluídas a menos que o usuário peça revisão.
 
-3. **Detectar contrato de backend (gate duro).** Antes de desenhar qualquer tela (fase 2 em diante), localize e leia o contrato **real** do backend — não a intenção de design — nesta ordem de prioridade: (a) **OpenAPI/Swagger** (`openapi.{yaml,json}`, `swagger.*`, rota servida tipo `/openapi.json`) — fonte primária; (b) **ADRs e decisões** (`docs/ddd/03-architecture.md`, ADRs) — onde mora o que foi decidido **não** fazer; (c) **tático** (`docs/ddd/02-tactical.md`). Produza um inventário curto: endpoints/queries disponíveis, campos que cada um retorna, e as **não-capacidades explícitas** (ex.: "snapshot-only, sem série histórica"). Se nenhuma fonte existe e o projeto não foi declarado greenfield, **pare** e pergunte ao usuário onde mora o contrato. Esse inventário é **restrição dura** das fases 2–4.
+3. **Detectar artefatos de DDD.** Verifique se `docs/ddd/` existe. Se sim, informe ao usuário quais artefatos foram encontrados e que serão usados como input nas fases correspondentes. Se não existe, a skill funciona standalone a partir do mini-mundo bruto — peça o mini-mundo se não foi fornecido.
 
-4. **Obter o mini-mundo.** Se o usuário não forneceu e não há `docs/ddd/01-strategic.md`, peça. Sondar: atores, contextos de uso, dispositivos-alvo, restrições visuais.
+4. **Detectar contrato de backend (gate duro).** Antes de desenhar qualquer tela (fase 2 em diante), localize e leia o contrato **real** do backend — não a intenção de design — nesta ordem de prioridade: (a) **OpenAPI/Swagger** (`openapi.{yaml,json}`, `swagger.*`, rota servida tipo `/openapi.json`) — fonte primária; (b) **ADRs e decisões** (`docs/ddd/03-architecture.md`, ADRs) — onde mora o que foi decidido **não** fazer; (c) **tático** (`docs/ddd/02-tactical.md`). Produza um inventário curto: endpoints/queries disponíveis, campos que cada um retorna, e as **não-capacidades explícitas** (ex.: "snapshot-only, sem série histórica"). Se nenhuma fonte existe e o projeto não foi declarado greenfield, **pare** e pergunte ao usuário onde mora o contrato. Esse inventário é **restrição dura** das fases 2–4.
 
-5. **Detectar stack.** Default `vite-react-ts`. Se o usuário passou `stack=<nome>` ou mencionou outra stack, use-a. Leia `templates/stacks/<stack>.md`. Se o arquivo não existir, **pare** e peça ao usuário as convenções; escreva o arquivo de stack antes de prosseguir.
+5. **Obter o mini-mundo.** Se o usuário não forneceu e não há `docs/ddd/01-strategic.md`, peça. Sondar: atores, contextos de uso, dispositivos-alvo, restrições visuais.
 
-6. **Rodar fase a fase, com checkpoint.** Leia o arquivo de método da fase, conduza o trabalho em conversa, escreva o artefato usando o template correspondente, apresente, pause. Não avance sem ordem do usuário.
+6. **Detectar stack.** Default `vite-react-ts`. Se o usuário passou `stack=<nome>` ou mencionou outra stack, use-a. Leia `templates/stacks/<stack>.md`. Se o arquivo não existir, **pare** e peça ao usuário as convenções; escreva o arquivo de stack antes de prosseguir.
+
+7. **Rodar fase a fase, com checkpoint.** Leia o arquivo de método da fase, conduza o trabalho em conversa, escreva o artefato usando o template correspondente, apresente, pause. Não avance sem ordem do usuário.
 
 ## Protocolo de checkpoint
 
@@ -51,6 +65,7 @@ Após cada fase:
 - **Não superdesenhe.** Calibre a complexidade pelo mini-mundo. Sistema pequeno não precisa de 5 personas e 10 jornadas. Cada fase explicita esse julgamento.
 - **Não invente requisitos.** Se o usuário não disse, não escreva como se ele tivesse dito. Quando faltar info, pergunte.
 - **Não desenhe telas antes da fase 2.** Discovery é sobre quem/quê/por quê. Telas vêm depois.
+- **Em modo evolução: editar, não reescrever; escopo = fatia; sem commit.** O mockup de UX da história é promovido a spec de componente ANTES de construir; a análise de impacto **para no checkpoint humano**. Superfície testável existente (testids/copy/roles assertados) só muda com decisão registrada. Artefatos existentes são editados com entrada no histórico de revisões (`CHG-NNN`). Lacuna de produto/UX devolve o card à `feature-loop`.
 
 ## Agents (dependências)
 
@@ -71,6 +86,7 @@ as signatures dos hooks de `api.ts`. Se um agent obrigatório está faltando, a 
 - `phases/02-ia-flows.md` — método de IA e fluxos (mapa de telas, navegação, controles transversais)
 - `phases/03-design-system.md` — método de design system (tokens, catálogo, spec por componente)
 - `phases/04-implementation.md` — orquestrador: fundação + cortes verticais despachando os 2 agents
+- `phases/evolution.md` — modo evolução (brownfield): promoção do mockup a spec + análise de impacto com checkpoint duro → construção cirúrgica → evolução de artefatos; entrada `CHG-NNN`, entrega sem commit
 - `templates/01-discovery.md.tmpl` — template do artefato de discovery
 - `templates/02-ia-flows.md.tmpl` — template do artefato de IA & fluxos
 - `templates/03-design-system.md.tmpl` — template do artefato de design system (tokens + catálogo + specs)

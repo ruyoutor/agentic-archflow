@@ -1,13 +1,17 @@
 ---
 name: ddd-architect
-description: "Desenha e constrói sistemas de software a partir de uma história de negócio (mini-mundo), ancorado em Domain-Driven Design e arquitetura equilibrada. Use quando o usuário quer design-first: refletir sobre domínio, subdomínios, linguagem ubíqua, bounded contexts (estratégico) → entidades, value objects, agregados, repositórios, invariantes (tático) → decisões arquiteturais com tradeoffs (sync/async, outbox, CQRS, monolito vs distribuído) → geração incremental de código com testes em paralelo via subagents. Cada fase produz um artefato markdown versionável em docs/ddd/. Triggers: 'modelar X com DDD', 'desenhar a arquitetura de Y', 'construir um sistema partindo do domínio', 'design-first', 'gerar código a partir do domínio', ou invocação explícita da skill. Stack default Go, com override (java-spring, node-ts, etc)."
+description: "Desenha, constrói E EVOLUI sistemas de software ancorados em Domain-Driven Design e arquitetura equilibrada. Greenfield: de uma história de negócio (mini-mundo) via estratégico → tático → decisões arquiteturais com tradeoffs → geração de código com testes em paralelo via subagents; artefatos versionáveis em docs/ddd/. MODO EVOLUÇÃO (brownfield): recebe um CHG-NNN da feature-loop e responde 'o que precisa mudar?' e 'quais trade-offs?' (análise de impacto com checkpoint humano duro) antes de construir cirurgicamente a fatia e evoluir os artefatos com histórico de revisões — sem commit (a aterrissagem é da feature-loop). Triggers: 'modelar X com DDD', 'desenhar a arquitetura de Y', 'construir um sistema partindo do domínio', 'design-first', 'gerar código a partir do domínio', 'trabalhar a fatia CHG-NNN em modo evolução', 'analisar o impacto de uma mudança no domínio', ou invocação explícita da skill. Stack default Go, com override (java-spring, node-ts, etc)."
 ---
 
 # ddd-architect
 
-Constrói sistemas a partir de um mini-mundo, em quatro fases checkpointadas. Cada fase produz um artefato em `docs/ddd/` (no projeto target, não na skill). O usuário revisa cada artefato antes da próxima fase.
+Constrói sistemas a partir de um mini-mundo, em quatro fases checkpointadas — e **evolui** sistemas já construídos em fatias, no modo evolução. Cada fase produz um artefato em `docs/ddd/` (no projeto target, não na skill). O usuário revisa cada artefato antes da próxima fase.
 
 ## Fluxo
+
+Dois modos:
+
+**Greenfield** (do mini-mundo à v1):
 
 | Fase | Método | Artefato |
 |---|---|---|
@@ -18,17 +22,27 @@ Constrói sistemas a partir de um mini-mundo, em quatro fases checkpointadas. Ca
 
 A fase 4 se decompõe em sub-fases (4.0 contratos → 4.1 domínio ∥ → 4.2 aplicação ∥ → 4.3 adapters → 4.4 composition).
 
+**Evolução** (brownfield — entrada é um `CHG-NNN` da `feature-loop`):
+
+| Fase | Método | Saída |
+|---|---|---|
+| E1. Análise de impacto | `phases/evolution.md` | seções 6–7 do CHG (**checkpoint humano duro**) |
+| E2. Construção cirúrgica | `phases/evolution.md` | diff da fatia, suíte inteira verde |
+| E3. Artefatos + relatório | `phases/evolution.md` | artefatos evoluídos com histórico de revisões; **sem commit** |
+
 ## Protocolo de ativação
 
 Ao ativar a skill:
 
-1. **Detectar estado.** Verifique se `docs/ddd/` existe no projeto. Se sim, liste os artefatos presentes e pergunte: **retomar**, **revisar fase específica**, ou **recomeçar**. Pule fases já concluídas a menos que o usuário peça revisão.
+1. **Detectar o modo.** Se a entrada é um `CHG-NNN` em `docs/changes/` (handoff da `feature-loop`) ou o usuário pede pra evoluir/mudar/consertar um sistema que já tem `docs/ddd/` + código construído → **modo evolução**: leia `phases/evolution.md` e siga por ele (as fases 1–4 abaixo são o repertório, não o roteiro). Caso contrário, greenfield.
 
-2. **Obter o mini-mundo.** Se o usuário não forneceu, peça. Sondar: atores, eventos de negócio, restrições, integrações, escala.
+2. **Detectar estado (greenfield).** Verifique se `docs/ddd/` existe no projeto. Se sim, liste os artefatos presentes e pergunte: **retomar**, **revisar fase específica**, ou **recomeçar**. Pule fases já concluídas a menos que o usuário peça revisão.
 
-3. **Detectar stack.** Default Go. Se o usuário passou `stack=<nome>` ou mencionou outra stack, use-a. Leia `templates/stacks/<stack>.md`. Se o arquivo não existir, **pare** e peça ao usuário as convenções; escreva o arquivo de stack antes de prosseguir.
+3. **Obter o mini-mundo.** Se o usuário não forneceu, peça. Sondar: atores, eventos de negócio, restrições, integrações, escala.
 
-4. **Rodar fase a fase, com checkpoint.** Leia o arquivo de método da fase, conduza o trabalho em conversa, escreva o artefato usando o template correspondente, apresente, pause. Não avance sem ordem do usuário.
+4. **Detectar stack.** Default Go. Se o usuário passou `stack=<nome>` ou mencionou outra stack, use-a. Leia `templates/stacks/<stack>.md`. Se o arquivo não existir, **pare** e peça ao usuário as convenções; escreva o arquivo de stack antes de prosseguir.
+
+5. **Rodar fase a fase, com checkpoint.** Leia o arquivo de método da fase, conduza o trabalho em conversa, escreva o artefato usando o template correspondente, apresente, pause. Não avance sem ordem do usuário.
 
 ## Protocolo de checkpoint
 
@@ -55,6 +69,7 @@ Se o usuário editar o `.md` manualmente, a versão editada vira a fonte da verd
 - **Seja explícito sobre incerteza.** Ao propor um modelo ou decisão, liste alternativas consideradas e o porquê da escolha. Tradeoffs vão no artefato, não só na conversa.
 - **Não superdesenhe.** Calibre a complexidade pelo mini-mundo. Sistema pequeno não precisa de 5 bounded contexts e outbox. A fase 3 explicita esse julgamento.
 - **Não invente regras de negócio.** Se o usuário não disse, não escreva como se ele tivesse dito. Quando faltar info, pergunte.
+- **Em modo evolução: editar, não reescrever; escopo = fatia; sem commit.** A análise de impacto (o que muda? que trade-offs?) precede qualquer código e **para no checkpoint humano**. Artefatos existentes são editados com entrada no histórico de revisões (`CHG-NNN`), nunca regenerados. A suíte **inteira** verde é o detector de preservação. Lacuna de produto na história devolve o card à `feature-loop` — não se remenda aqui.
 
 ## Agents (dependências)
 
@@ -75,6 +90,7 @@ Se um agent obrigatório está faltando, a skill PARA e pede pra instalar antes 
 - `phases/02-tactical.md` — método tático (entidades, VOs, agregados, repositórios, invariantes, eventos)
 - `phases/03-architecture.md` — árvore de decisão arquitetural (topologia, comunicação, consistência, padrões de leitura, evolução)
 - `phases/04-implementation.md` — orquestrador da fase de código
+- `phases/evolution.md` — modo evolução (brownfield): análise de impacto com checkpoint duro → construção cirúrgica → evolução de artefatos; entrada `CHG-NNN`, entrega sem commit
 - `phases/04-0-contracts.md` — geração de contratos compartilhados
 - `phases/04-1-domain.md` — domínio em paralelo (testes ∥ código via subagents)
 - `phases/04-2-application.md` — aplicação em paralelo (testes ∥ código via subagents)
